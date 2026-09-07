@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
+  passwordHash    String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  dailySteps      Int             @default(10000)
+  dailyCalories   Int             @default(2000)
+  weeklyWorkouts  Int             @default(4)
+  waterIntake     Int             @default(8)
+  targetWeight    Float?
+  units           String          @default("metric")
+  theme           String          @default("dark")
+  notifications   Boolean         @default(true)
+  workouts        Workout[]
+  meals           Meal[]
+  activities      DailyActivity[]
+}
+
+model Workout {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            String
+  duration        Int
+  caloriesBurned  Int      @default(0)
+  exercisesJson   String   @default("[]")
+  notes           String?
+  date            String
+  createdAt       DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model Meal {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      String
+  calories  Int
+  protein   Int      @default(0)
+  carbs     Int      @default(0)
+  fat       Int      @default(0)
+  date      String
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model DailyActivity {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            String
+  steps           Int      @default(0)
+  caloriesBurned  Int      @default(0)
+  activeMinutes   Int      @default(0)
+  waterIntake     Int      @default(0)
+  weight          Float?
+
+  @@unique([userId, date])
+  @@index([userId])
+}
