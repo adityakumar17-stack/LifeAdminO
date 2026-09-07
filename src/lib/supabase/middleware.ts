@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
           name: string;
           value: string;
           options: CookieOptions;
-        }[]
+        }[],
       ) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
@@ -54,11 +54,12 @@ export async function updateSession(request: NextRequest) {
 
   const isProtected = protectedPrefixes.some(
     (prefix) =>
-      pathname === prefix || pathname.startsWith(`${prefix}/`)
+      pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
   if (isProtected && !user) {
     const redirect = request.nextUrl.clone();
+
     redirect.pathname = "/";
     redirect.search = "";
 
